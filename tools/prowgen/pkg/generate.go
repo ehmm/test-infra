@@ -215,6 +215,7 @@ func (cli *Client) ConvertJobConfig(fileName string, jobsConfig spec.JobsConfig,
 	for _, parentJob := range jobsConfig.Jobs {
 		expandedJobs := decorator.ApplyVariables(parentJob, jobsConfig.Params, jobsConfig.Matrix)
 		for _, job := range expandedJobs {
+			name := job.Name
 			brancher := config.Brancher{
 				Branches: []string{fmt.Sprintf("^%s$", branch)},
 			}
@@ -226,10 +227,8 @@ func (cli *Client) ConvertJobConfig(fileName string, jobsConfig spec.JobsConfig,
 			testgridJobPrefix += "_" + jobsConfig.Repo
 
 			if len(job.Types) == 0 || sets.NewString(job.Types...).Has(TypePresubmit) {
-				if cli.SkipNameSuffix {
-					name := job.Name
-				} else {
-					name := fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
+				if !cli.SkipNameSuffix {
+					name = fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
 					if branch != "master" {
 						name += "_" + branch
 					}
@@ -275,14 +274,12 @@ func (cli *Client) ConvertJobConfig(fileName string, jobsConfig spec.JobsConfig,
 			}
 
 			if len(job.Types) == 0 || sets.NewString(job.Types...).Has(TypePostsubmit) {
-				if cli.SkipNameSuffix {
-					name := job.Name
-				} else {
-					name := fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
+				if !cli.SkipNameSuffix {
+					name = fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
 					if branch != "master" {
 						name += "_" + branch
 					}
-					name += "_postsubmit"
+					name = "_postsubmit"
 				}
 
 				base, err := cli.createJobBase(baseConfig, jobsConfig, job, name, branch, jobsConfig.ResourcePresets)
