@@ -70,12 +70,14 @@ type Job struct {
 
 	DisableReleaseBranching bool `json:"disable_release_branching,omitempty"`
 
-	Name    string   `json:"name,omitempty"`
+	Name     string   `json:"name,omitempty"`
 	Command []string `json:"command,omitempty"`
 	Args    []string `json:"args,omitempty"`
 	Tags    []string `json:"tags,omitempty"`
 	Types   []string `json:"types,omitempty"`
 	Repos   []string `json:"repos,omitempty"`
+
+	RerunCommand string   `json:"rerun_command,omitempty"`
 
 	GerritPresubmitLabel  string `json:"gerrit_presubmit_label,omitempty"`
 	GerritPostsubmitLabel string `json:"gerrit_postsubmit_label,omitempty"`

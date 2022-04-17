@@ -257,10 +257,19 @@ func (cli *Client) ConvertJobConfig(fileName string, jobsConfig spec.JobsConfig,
 					presubmit.AlwaysRun = false
 				}
 				if job.Trigger != "" {
-					defaultTrigger := config.DefaultTriggerFor(presubmit.JobBase.Name)
-					// Match the default trigger + the new trigger.
-					presubmit.Trigger = fmt.Sprintf("(%s)|((?m)^%s(\\s+|$))", defaultTrigger, job.Trigger)
+					if cli.SkipNameSuffix {
+						presubmit.Trigger = job.Trigger
+					} else {
+						defaultTrigger := config.DefaultTriggerFor(presubmit.JobBase.Name)
+						// Match the default trigger + the new trigger.
+						presubmit.Trigger = fmt.Sprintf("(%s)|((?m)^%s(\\s+|$))", defaultTrigger, job.Trigger)
+					}
 				}
+				if job.RerunCommand != "" {
+					print("Rerun command " + job.RerunCommand)
+					presubmit.RerunCommand = job.RerunCommand
+				}
+
 				if testgridConfig.Enabled {
 					if err := mergo.Merge(&presubmit.JobBase.Annotations, map[string]string{
 						TestGridDashboard: testgridJobPrefix,
@@ -317,11 +326,13 @@ func (cli *Client) ConvertJobConfig(fileName string, jobsConfig spec.JobsConfig,
 			}
 
 			if sets.NewString(job.Types...).Has(TypePeriodic) {
-				name := fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
-				if branch != "master" {
-					name += "_" + branch
+				if !cli.SkipNameSuffix {
+					name = fmt.Sprintf("%s_%s", job.Name, jobsConfig.Repo)
+					if branch != "master" {
+						name += "_" + branch
+					}
+					name += "_periodic"
 				}
-				name += "_periodic"
 
 				// For periodic jobs, the repo needs to be added to the clonerefs and its root directory
 				// should be set as the working directory, so add itself to the repo list here.
