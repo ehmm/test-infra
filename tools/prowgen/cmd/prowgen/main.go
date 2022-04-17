@@ -43,6 +43,7 @@ var (
 	preprocessCommand   = flag.String("pre-process-command", "", "command to run to preprocess the meta config files")
 	postprocessCommand  = flag.String("post-process-command", "", "command to run to postprocess the generated config files")
 	longJobNamesAllowed = flag.Bool("allow-long-job-names", false, "allow job names that are longer than 63 characters")
+	skipNameSuffix = flag.Bool("skip-name-suffix", false, "skip adding suffix to test names")
 )
 
 func main() {
@@ -76,7 +77,7 @@ func main() {
 			if _, err := os.Stat(filepath.Join(path, ".base.yaml")); !os.IsNotExist(err) {
 				baseConfig = pkg.ReadBase(&baseConfig, filepath.Join(path, ".base.yaml"))
 			}
-			cli := pkg.Client{BaseConfig: baseConfig, LongJobNamesAllowed: *longJobNamesAllowed}
+			cli := pkg.Client{BaseConfig: baseConfig, LongJobNamesAllowed: *longJobNamesAllowed, SkipNameSuffix: *skipNameSuffix}
 
 			files, _ := ioutil.ReadDir(path)
 			for _, file := range files {
