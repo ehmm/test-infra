@@ -96,6 +96,7 @@ type CommonConfig struct {
 
 	Cluster      string            `json:"cluster,omitempty"`
 	NodeSelector map[string]string `json:"node_selector,omitempty"`
+	Tolerations []v1.Toleration    `json:"tolerations,omitempty"`
 
 	Annotations map[string]string `json:"annotations,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`

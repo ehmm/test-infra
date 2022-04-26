@@ -415,6 +415,7 @@ func (cli *Client) createJobBase(baseConfig spec.BaseConfig, jobConfig spec.Jobs
 		Spec: &v1.PodSpec{
 			Containers:   createContainer(jobConfig, job, resources),
 			NodeSelector: job.NodeSelector,
+			Tolerations: job.Tolerations,
 		},
 		UtilityConfig: config.UtilityConfig{
 			Decorate:  &yes,
